@@ -1,0 +1,1431 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f6fed">
+  <meta name="description" content="HVDT 형태 영역 진행 방법을 단계별로 확인하는 교육용 튜토리얼">
+  <title>HVDT 형태 진행 방법</title>
+  <style>
+    :root {
+      --primary: #2f6fed;
+      --primary-dark: #1e55bd;
+      --primary-soft: #eaf1ff;
+      --text: #1b2538;
+      --muted: #637083;
+      --line: #dce3ed;
+      --surface: #ffffff;
+      --background: #f3f7fc;
+      --notice-bg: #fff5df;
+      --notice-line: #efaa2f;
+      --notice-text: #6b4300;
+      --shadow: 0 16px 40px rgba(40, 65, 105, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--background);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #e3edff 0, transparent 38%),
+        var(--background);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR",
+        "Apple SD Gothic Neo", Arial, sans-serif;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(47, 111, 237, 0.35);
+      outline-offset: 3px;
+    }
+
+    .app {
+      width: min(100%, 720px);
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 16px
+        max(18px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      padding: 5px 4px 18px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-title {
+      min-width: 0;
+    }
+
+    .organization-logo {
+      width: clamp(145px, 32vw, 220px);
+      height: auto;
+      flex: 0 0 auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .eyebrow {
+      margin: 0 0 3px;
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 6vw, 2.15rem);
+      line-height: 1.3;
+      letter-spacing: -0.04em;
+    }
+
+    .progress-area {
+      margin-top: 16px;
+    }
+
+    .progress-labels {
+      margin-bottom: 7px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dfe7f3;
+    }
+
+    .progress-bar {
+      width: 10%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), #62a0ff);
+      transition: width 220ms ease;
+    }
+
+    .tutorial-card {
+      flex: 1;
+      padding: clamp(22px, 6vw, 38px);
+      border: 1px solid rgba(216, 225, 238, 0.9);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .step-title {
+      margin: 14px 0 18px;
+      font-size: clamp(1.45rem, 6vw, 2rem);
+      line-height: 1.35;
+      letter-spacing: -0.035em;
+    }
+
+    .breadcrumb {
+      margin: 0 0 14px;
+      color: var(--primary-dark);
+      font-size: 0.94rem;
+      font-weight: 800;
+    }
+
+    .app-header .breadcrumb {
+      margin: 12px 0 0;
+    }
+
+    .content-list {
+      margin: 0;
+      padding-left: 1.3em;
+      font-size: clamp(1.05rem, 4.3vw, 1.16rem);
+    }
+
+    .content-list li {
+      padding-left: 0.25em;
+    }
+
+    .content-list li + li {
+      margin-top: 10px;
+    }
+
+    .guide-image {
+      width: 100%;
+      max-height: 380px;
+      margin-top: 20px;
+      display: block;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #f7f9fc;
+    }
+
+    .image-caption {
+      margin: 8px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .sequence-menu {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .sequence-button {
+      width: 100%;
+      min-height: 72px;
+      padding: 13px 15px;
+      border: 1px solid #d7e2f3;
+      border-radius: 15px;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      background: #f8faff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1rem;
+      font-weight: 750;
+    }
+
+    .sequence-button:hover {
+      border-color: #a9c2ef;
+      background: var(--primary-soft);
+    }
+
+    .sequence-number {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .sequence-label {
+      font-size: 1.05rem;
+      line-height: 1.35;
+    }
+
+    .sequence-intro {
+      margin: 0 0 15px;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .sequence-action {
+      color: var(--primary-dark);
+      font-size: 0.88rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .script-box {
+      margin-top: 20px;
+      padding: 19px;
+      border-left: 5px solid var(--primary);
+      border-radius: 8px 16px 16px 8px;
+      background: #f4f7fd;
+    }
+
+    .box-label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--primary-dark);
+      font-size: 0.87rem;
+      font-weight: 800;
+    }
+
+    .script-box p,
+    .notice-box p {
+      margin: 0;
+      font-size: clamp(1.02rem, 4.1vw, 1.13rem);
+      font-weight: 650;
+    }
+
+    .notice-box {
+      margin-top: 20px;
+      padding: 17px 18px;
+      border: 1px solid #f1c36f;
+      border-left: 5px solid var(--notice-line);
+      border-radius: 8px 16px 16px 8px;
+      color: var(--notice-text);
+      background: var(--notice-bg);
+    }
+
+    .notice-box .box-label {
+      color: #8b5900;
+    }
+
+    .flow {
+      margin-top: 20px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .flow-item {
+      position: relative;
+      padding: 13px 16px 13px 47px;
+      border: 1px solid #d9e4f7;
+      border-radius: 13px;
+      background: #f7faff;
+      font-size: 1rem;
+      font-weight: 750;
+    }
+
+    .flow-item::before {
+      content: attr(data-number);
+      position: absolute;
+      top: 50%;
+      left: 13px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--primary);
+      font-size: 0.78rem;
+      transform: translateY(-50%);
+    }
+
+    .video-button {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 24px;
+      border: 0;
+      border-radius: 15px;
+      color: #ffffff;
+      background: var(--primary);
+      box-shadow: 0 8px 18px rgba(47, 111, 237, 0.23);
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .video-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .navigation {
+      padding-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-button {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 14px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      line-height: 1.25;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .nav-button.prev {
+      border: 1px solid #cbd6e5;
+      color: var(--text);
+      background: #ffffff;
+    }
+
+    .nav-button.next {
+      border: 1px solid var(--primary);
+      color: #ffffff;
+      background: var(--primary);
+    }
+
+    .nav-button.home-nav {
+      border: 1px solid var(--primary);
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+    }
+
+    .nav-button.progress-return {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      border: 1px solid var(--primary-dark);
+      color: #ffffff;
+      background: var(--primary-dark);
+      box-shadow: 0 8px 18px rgba(30, 85, 189, 0.22);
+    }
+
+    .navigation.has-progress-return .nav-button.prev,
+    .navigation.has-progress-return .nav-button.home-nav,
+    .navigation.has-progress-return .nav-button.next {
+      grid-row: 2;
+    }
+
+    .nav-button[hidden] {
+      display: none;
+    }
+
+    .home-flow {
+      display: grid;
+      gap: 12px;
+    }
+
+    .home-flow-button {
+      width: 100%;
+      min-height: 76px;
+      padding: 14px 18px;
+      border: 1px solid #cddcf2;
+      border-radius: 17px;
+      display: grid;
+      grid-template-columns: 45px 1fr;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      background: #f7faff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1.12rem;
+      font-weight: 850;
+    }
+
+    .video-category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .video-category-button {
+      min-height: 150px;
+      padding: 22px 16px;
+      border: 1px solid #cddcf2;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      color: var(--text);
+      background: #f7faff;
+      cursor: pointer;
+      text-align: center;
+      font-size: clamp(1.3rem, 4.6vw, 1.55rem);
+      font-weight: 850;
+    }
+
+    .video-category-button:hover {
+      border-color: #9bb9ea;
+      background: var(--primary-soft);
+    }
+
+    .home-flow-number {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background: var(--primary);
+    }
+
+    .video-modal {
+      width: min(calc(100% - 24px), 760px);
+      max-height: calc(100dvh - 24px);
+      padding: 0;
+      border: 0;
+      border-radius: 22px;
+      overflow: hidden;
+      color: var(--text);
+      background: #ffffff;
+      box-shadow: 0 24px 80px rgba(16, 30, 54, 0.35);
+    }
+
+    .video-modal::backdrop {
+      background: rgba(15, 25, 42, 0.7);
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-header {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.08rem;
+    }
+
+    .close-button {
+      min-width: 70px;
+      min-height: 44px;
+      border: 1px solid #ccd6e4;
+      border-radius: 12px;
+      color: var(--text);
+      background: #f6f8fb;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .video-wrap {
+      position: relative;
+      background: #101722;
+    }
+
+    video {
+      width: 100%;
+      max-height: 72dvh;
+      display: block;
+      background: #000000;
+    }
+
+    .video-loading {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background: rgba(7, 13, 24, 0.72);
+      font-size: 1rem;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    .video-loading[hidden] {
+      display: none;
+    }
+
+    .video-help {
+      margin: 0;
+      padding: 13px 18px 17px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .video-error {
+      margin: 0;
+      padding: 14px 18px;
+      color: #8a2c20;
+      background: #fff0ed;
+      font-size: 0.92rem;
+      font-weight: 750;
+    }
+
+    .direct-video-link {
+      margin: 0 18px 16px;
+      min-height: 48px;
+      border: 1px solid #cbd7e8;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-dark);
+      background: #f5f8fd;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    @media (max-width: 440px) {
+      .app {
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+
+      .tutorial-card {
+        border-radius: 20px;
+      }
+
+      .header-row {
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .organization-logo {
+        width: 125px;
+        margin-top: 4px;
+      }
+
+      .navigation {
+        gap: 8px;
+      }
+
+      .nav-button {
+        padding: 0 9px;
+        font-size: 0.92rem;
+      }
+
+      .nav-button {
+        padding: 0 7px;
+      }
+
+      .video-category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .video-category-button {
+        min-height: 112px;
+      }
+
+      .video-modal {
+        width: calc(100% - 12px);
+        max-height: calc(100dvh - 12px);
+        border-radius: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <div class="header-row">
+        <div class="header-title">
+          <p class="eyebrow">HVDT TUTORIAL</p>
+          <h1>HVDT 형태 진행 방법</h1>
+        </div>
+        <img
+          class="organization-logo"
+          src="images/bucheon-welfare-logo.png"
+          alt="부천시장애인종합복지관"
+        >
+      </div>
+      <p class="breadcrumb" id="breadcrumb">검사 진행 흐름</p>
+    </header>
+
+    <article class="tutorial-card" id="tutorialCard" aria-live="polite">
+      <span class="step-badge" id="stepBadge">홈</span>
+      <h2 class="step-title" id="stepTitle">검사 진행 흐름</h2>
+      <div id="stepContent"></div>
+      <button class="video-button" id="videoButton" type="button" hidden>
+        ▶ 영상 보기
+      </button>
+    </article>
+
+    <nav class="navigation" aria-label="튜토리얼 단계 이동">
+      <button class="nav-button prev" id="prevButton" type="button">← 이전</button>
+      <button class="nav-button progress-return" id="progressButton" type="button">
+        검사 진행으로 돌아가기
+      </button>
+      <button class="nav-button home-nav" id="flowButton" type="button">홈</button>
+      <button class="nav-button next" id="nextButton" type="button">다음 →</button>
+    </nav>
+  </main>
+
+  <dialog class="video-modal" id="videoModal" aria-labelledby="videoTitle">
+    <div class="modal-header">
+      <h2 id="videoTitle">단계 영상</h2>
+      <button class="close-button" id="closeVideoButton" type="button">닫기</button>
+    </div>
+    <div class="video-wrap">
+      <video
+        id="tutorialVideo"
+        controls
+        playsinline
+        webkit-playsinline
+        preload="metadata"
+      >
+        브라우저에서 영상을 재생할 수 없습니다.
+      </video>
+      <div class="video-loading" id="videoLoading" hidden>영상을 불러오는 중입니다…</div>
+    </div>
+    <p class="video-error" id="videoError" hidden></p>
+    <a class="direct-video-link" id="directVideoLink" href="#" target="_blank" rel="noopener">
+      영상이 안 보이면 여기서 열기
+    </a>
+    <p class="video-help">영상이 보이지 않으면 videos 폴더와 파일명을 확인해 주세요.</p>
+  </dialog>
+
+  <script type="text/plain" id="legacyScript">
+    /*
+      영상 파일명을 바꾸려면 아래 steps 데이터의 video 항목만 수정하세요.
+      예: video: "videos/새로운_파일명.mp4"
+      영상이 없는 단계는 video: null로 두면 “영상 보기” 버튼이 숨겨집니다.
+    */
+    const steps = [
+      {
+        title: "형태 검사 시작",
+        bullets: [
+          "형태 영역의 검사임을 안내합니다."
+        ],
+        script: "이제부터는 모두가 같은 부분으로 되어있지만 배열이 다릅니다. 손 안에 있는 물건과 같은 배열로 생각되는 그림을 골라주세요. 엄지손가락이 물체의 윗부분이고, 새끼손가락이 물체의 아랫부분입니다.",
+        image: "images/thumb_pinky_direction.png",
+        imageAlt: "엄지손가락이 위, 새끼손가락이 아래인 물체 방향 설명",
+        notice: null,
+        video: null
+      },
+      {
+        title: "물체 제공 방향",
+        bullets: [
+          "6번째 포스트를 제외한 나머지 물체는 뒤집어서 제공합니다.",
+          "6번째 포스트는 그대로 제공합니다."
+        ],
+        script: null,
+        notice: "6번째 포스트만 그대로 제공하고, 나머지 물체는 뒤집어서 제공합니다.",
+        video: "videos/video_01_object_direction.mp4"
+      },
+      {
+        title: "전체 진행 순서 보기",
+        sequenceIntro: "실제 평가 진행 순서",
+        sequence: [
+          { label: "물체 놓기", detail: "당사자 손에 물체를 뒤집어서 놓는다.", target: 3 },
+          { label: "순서 번호 확인", detail: "검사지에 첫번째 순서 번호를 확인한다.", target: 4 },
+          { label: "상단 번호 찾기", detail: "첫번째 순서 번호와 같은 번호를 상단에서 찾는다.", target: 5 },
+          { label: "답안 위치 확인", detail: "형태로 내려와 해당 번호의 답안 위치를 확인한다.", target: 6 },
+          { label: "반응 번호 확인", detail: "그림책자에서 당사자가 반응한 번호를 확인한다.", target: 7 },
+          { label: "답안 기록", detail: "검사지의 답안 칸에 반응한 번호를 적는다.", target: 8 },
+          { label: "물체 넣기", detail: "손에 올려진 물체를 도구상자에 뒤집어 넣는다.", target: 9 }
+        ],
+        script: null,
+        notice: null,
+        video: null
+      },
+      {
+        title: "당사자 손에 물체를 뒤집어서 놓는다",
+        bullets: [
+          "당사자 손에 물체를 놓습니다.",
+          "6번째 포스트를 제외하고 물체는 뒤집어서 놓습니다.",
+          "물체의 윗부분이 엄지손가락 쪽에 오도록 합니다."
+        ],
+        script: null,
+        notice: "물체의 윗부분은 엄지손가락 쪽입니다.",
+        video: "videos/video_03_place_object.mp4"
+      },
+      {
+        title: "검사지에 첫번째 순서 번호를 확인한다",
+        bullets: [
+          "검사지에서 첫번째 순서 번호를 확인합니다."
+        ],
+        script: null,
+        notice: "첫 번째 물체가 1번이라는 뜻이 아니라, 첫 번째 순서에 제시되는 번호를 확인해야 합니다.",
+        video: "videos/video_04_check_order_number.mp4"
+      },
+      {
+        title: "첫번째 순서 번호와 같은 번호를 상단에서 찾는다",
+        bullets: [
+          "검사지 상단에서 첫번째 순서 번호와 같은 번호를 찾습니다."
+        ],
+        script: null,
+        notice: null,
+        video: "videos/video_05_find_answer_position.mp4"
+      },
+      {
+        title: "형태로 내려와 해당 번호의 답안 위치를 확인한다",
+        bullets: [
+          "찾은 번호에서 형태 영역으로 내려옵니다.",
+          "해당 번호의 답안 위치를 확인합니다."
+        ],
+        script: null,
+        notice: null,
+        video: "videos/video_05_find_answer_position.mp4"
+      },
+      {
+        title: "그림책자에서 당사자가 반응한 번호를 확인한다",
+        bullets: [
+          "그림책자에서 당사자가 반응한 번호를 확인합니다."
+        ],
+        script: null,
+        notice: null,
+        video: "videos/video_06_write_response.mp4"
+      },
+      {
+        title: "검사지의 답안 칸에 반응한 번호를 적는다",
+        bullets: [
+          "검사지의 답안 칸에 당사자가 반응한 번호를 적습니다."
+        ],
+        script: null,
+        notice: "정답 번호가 아니라, 당사자의 반응 번호를 적습니다.",
+        video: "videos/video_06_write_response.mp4"
+      },
+      {
+        title: "손에 올려진 물체를 도구상자에 뒤집어 넣는다",
+        bullets: [
+          "손에 올려진 물체를 도구상자에 뒤집어 넣습니다.",
+          "같은 방법으로 다음 순서도 반복합니다."
+        ],
+        script: null,
+        notice: null,
+        video: "videos/video_07_repeat_flow.mp4"
+      }
+    ];
+
+    const stepBadge = document.getElementById("stepBadge");
+    const stepTitle = document.getElementById("stepTitle");
+    const breadcrumb = document.getElementById("breadcrumb");
+    const stepContent = document.getElementById("stepContent");
+    const stepCount = document.getElementById("stepCount");
+    const progressBar = document.getElementById("progressBar");
+    const progressPercent = document.getElementById("progressPercent");
+    const progressTrack = document.getElementById("progressTrack");
+    const prevButton = document.getElementById("prevButton");
+    const menuButton = document.getElementById("menuButton");
+    const nextButton = document.getElementById("nextButton");
+    const navigation = document.querySelector(".navigation");
+    const videoButton = document.getElementById("videoButton");
+    const videoModal = document.getElementById("videoModal");
+    const tutorialVideo = document.getElementById("tutorialVideo");
+    const videoTitle = document.getElementById("videoTitle");
+    const videoError = document.getElementById("videoError");
+    const videoLoading = document.getElementById("videoLoading");
+    const directVideoLink = document.getElementById("directVideoLink");
+    const closeVideoButton = document.getElementById("closeVideoButton");
+
+    let currentStep = 0;
+
+    function makeList(items, className = "content-list") {
+      if (!items || items.length === 0) return "";
+      return `
+        <ul class="${className}">
+          ${items.map((item) => `<li>${item}</li>`).join("")}
+        </ul>
+      `;
+    }
+
+    function makeSequenceMenu(items) {
+      if (!items || items.length === 0) return "";
+      return `
+        <ol class="sequence-menu" aria-label="전체 진행 순서 목차">
+          ${items.map((item, index) => `
+            <li>
+              <button
+                class="sequence-button"
+                type="button"
+                data-target-step="${item.target}"
+                aria-label="${item.label} ${item.target + 1}단계 보기"
+              >
+                <span class="sequence-number">${index + 1}</span>
+                <span class="sequence-label">${item.label}</span>
+                <span class="sequence-action">보기 ▶</span>
+              </button>
+            </li>
+          `).join("")}
+        </ol>
+      `;
+    }
+
+    function makeFlow(items) {
+      if (!items || items.length === 0) return "";
+      return `
+        <div class="flow" aria-label="반복 진행 흐름">
+          ${items.map((item, index) => `
+            <div class="flow-item" data-number="${index + 1}">${item}</div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderStep() {
+      const step = steps[currentStep];
+      const number = currentStep + 1;
+      const percentage = Math.round((number / steps.length) * 100);
+
+      stepBadge.textContent = `${number}단계`;
+      stepTitle.textContent = step.title;
+      const isDetailStep = currentStep >= 3;
+      breadcrumb.hidden = !isDetailStep;
+      breadcrumb.textContent = isDetailStep ? `전체 진행 순서 > ${step.title}` : "";
+      navigation.classList.toggle("detail-navigation", isDetailStep);
+      stepCount.textContent = `${number} / ${steps.length}`;
+      stepCount.setAttribute("aria-label", `현재 ${steps.length}단계 중 ${number}단계`);
+
+      progressBar.style.width = `${percentage}%`;
+      progressPercent.textContent = `${percentage}%`;
+      progressTrack.setAttribute("aria-valuenow", number);
+
+      stepContent.innerHTML = [
+        makeList(step.bullets),
+        step.sequenceIntro ? `<p class="sequence-intro">${step.sequenceIntro}</p>` : "",
+        makeSequenceMenu(step.sequence),
+        step.script ? `
+          <div class="script-box">
+            <span class="box-label">검사자 멘트</span>
+            <p>“${step.script}”</p>
+          </div>
+        ` : "",
+        step.image ? `
+          <img class="guide-image" src="${step.image}" alt="${step.imageAlt || ""}">
+          <p class="image-caption">엄지손가락이 위, 새끼손가락이 아래</p>
+        ` : "",
+        step.notice ? `
+          <div class="notice-box">
+            <span class="box-label">주의사항</span>
+            <p>${step.notice}</p>
+          </div>
+        ` : "",
+        makeFlow(step.flow)
+      ].join("");
+
+      videoButton.hidden = !step.video;
+      prevButton.disabled = currentStep === 0;
+      nextButton.textContent = currentStep === steps.length - 1 ? "처음으로" : "다음 →";
+
+      stepContent.querySelectorAll("[data-target-step]").forEach((button) => {
+        button.addEventListener("click", () => {
+          currentStep = Number(button.dataset.targetStep);
+          renderStep();
+        });
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeVideo() {
+      tutorialVideo.pause();
+      tutorialVideo.removeAttribute("src");
+      tutorialVideo.load();
+      videoError.hidden = true;
+      videoError.textContent = "";
+      videoLoading.hidden = true;
+      videoModal.close();
+    }
+
+    function openVideo(videoPath, title) {
+      const safeVideoPath = encodeURI(videoPath);
+      videoError.hidden = true;
+      videoError.textContent = "";
+      videoLoading.hidden = false;
+      videoTitle.textContent = title;
+      directVideoLink.href = safeVideoPath;
+      tutorialVideo.pause();
+      tutorialVideo.src = safeVideoPath;
+      tutorialVideo.load();
+      videoModal.showModal();
+      tutorialVideo.play().catch(() => {
+        // 자동 재생이 제한된 경우 영상의 재생 버튼을 누르면 됩니다.
+      });
+    }
+
+    prevButton.addEventListener("click", () => {
+      if (currentStep > 0) {
+        currentStep -= 1;
+        renderStep();
+      }
+    });
+
+    menuButton.addEventListener("click", () => {
+      currentStep = 2;
+      renderStep();
+    });
+
+    nextButton.addEventListener("click", () => {
+      currentStep = currentStep === steps.length - 1 ? 0 : currentStep + 1;
+      renderStep();
+    });
+
+    videoButton.addEventListener("click", () => {
+      const step = steps[currentStep];
+      if (!step.video) return;
+
+      tutorialVideo.src = step.video;
+      videoTitle.textContent = `${currentStep + 1}단계 영상 · ${step.title}`;
+      videoModal.showModal();
+      tutorialVideo.play().catch(() => {
+        // 모바일 브라우저의 자동 재생 제한 시 사용자가 재생 버튼을 누를 수 있습니다.
+      });
+    });
+
+    closeVideoButton.addEventListener("click", closeVideo);
+
+    videoModal.addEventListener("click", (event) => {
+      if (event.target === videoModal) closeVideo();
+    });
+
+    videoModal.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeVideo();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (videoModal.open) return;
+      if (event.key === "ArrowLeft" && currentStep > 0) {
+        currentStep -= 1;
+        renderStep();
+      }
+      if (event.key === "ArrowRight") {
+        currentStep = currentStep === steps.length - 1 ? 0 : currentStep + 1;
+        renderStep();
+      }
+    });
+
+    renderStep();
+  </script>
+  <script>
+    /*
+      영상 파일명을 바꾸려면 아래 데이터의 video 항목만 수정하세요.
+      예: video: "videos/새로운_파일명.mp4"
+    */
+    const explanation = {
+      title: "형태 검사 시작",
+      bullets: ["형태 영역의 검사임을 안내합니다."],
+      script: "이제부터는 모두가 같은 부분으로 되어있지만 배열이 다릅니다. 손 안에 있는 물건과 같은 배열로 생각되는 그림을 골라주세요. 엄지손가락이 물체의 윗부분이고, 새끼손가락이 물체의 아랫부분입니다.",
+      image: "images/thumb_pinky_direction.png",
+      imageAlt: "엄지손가락이 위, 새끼손가락이 아래인 물체 방향 설명"
+    };
+
+    const tips = {
+      title: "검사 진행 팁",
+      bullets: [
+        "6번째 포스트를 제외한 나머지 물체는 뒤집어서 제공합니다.",
+        "6번째 포스트는 그대로 제공합니다."
+      ],
+      notice: "6번째 포스트만 그대로 제공하고, 나머지 물체는 뒤집어서 제공합니다.",
+      video: "videos/video_01_object_direction.mp4"
+    };
+
+    /*
+      전체 영상 파일명입니다.
+      실제 파일명이 다르면 아래 두 경로만 수정하세요.
+    */
+    const fullVideos = [
+      {
+        title: "실린더 영상",
+        video: "videos/video_full_cylinder.mp4"
+      },
+      {
+        title: "포스트 영상",
+        video: "videos/video_full_post.mp4"
+      }
+    ];
+
+    const detailSteps = [
+      {
+        shortTitle: "물체 놓기",
+        title: "당사자 손에 물체를 뒤집어서 놓는다",
+        bullets: [
+          "당사자 손에 물체를 놓습니다.",
+          "6번째 포스트를 제외하고 물체는 뒤집어서 놓습니다.",
+          "물체의 윗부분이 엄지손가락 쪽에 오도록 합니다."
+        ],
+        notice: "물체의 윗부분은 엄지손가락 쪽입니다.",
+        video: "videos/video_03_place_object.mp4"
+      },
+      {
+        shortTitle: "순서 번호 확인",
+        title: "검사지에 첫번째 순서 번호를 확인한다",
+        bullets: ["검사지에서 첫번째 순서 번호를 확인합니다."],
+        notice: "첫 번째 물체가 1번이라는 뜻이 아니라, 첫 번째 순서에 제시되는 번호를 확인해야 합니다.",
+        video: "videos/video_04_check_order_number.mp4"
+      },
+      {
+        shortTitle: "상단 번호 찾기",
+        title: "첫번째 순서 번호와 같은 번호를 상단에서 찾는다",
+        bullets: ["검사지 상단에서 첫번째 순서 번호와 같은 번호를 찾습니다."],
+        video: "videos/video_05_find_top_number.mp4"
+      },
+      {
+        shortTitle: "답안 위치 확인",
+        title: "형태로 내려와 해당 번호의 답안 위치를 확인한다",
+        bullets: [
+          "찾은 번호에서 형태 영역으로 내려옵니다.",
+          "해당 번호의 답안 위치를 확인합니다."
+        ],
+        video: "videos/video_06_find_answer_position.mp4"
+      },
+      {
+        shortTitle: "반응 번호 확인",
+        title: "그림책자에서 당사자가 반응한 번호를 확인한다",
+        bullets: ["그림책자에서 당사자가 반응한 번호를 확인합니다."],
+        video: "videos/video_07_check_response_number.mp4"
+      },
+      {
+        shortTitle: "답안 기록",
+        title: "검사지의 답안 칸에 반응한 번호를 적는다",
+        bullets: ["검사지의 답안 칸에 당사자가 반응한 번호를 적습니다."],
+        notice: "정답 번호가 아니라, 당사자의 반응 번호를 적습니다.",
+        video: "videos/video_08_write_response.mp4"
+      },
+      {
+        shortTitle: "물체 넣기",
+        title: "손에 올려진 물체를 도구상자에 뒤집어 넣는다",
+        bullets: [
+          "손에 올려진 물체를 도구상자에 뒤집어 넣습니다.",
+          "같은 방법으로 다음 순서도 반복합니다."
+        ],
+        video: "videos/video_09_return_object.mp4"
+      }
+    ];
+
+    const stepBadge = document.getElementById("stepBadge");
+    const stepTitle = document.getElementById("stepTitle");
+    const breadcrumb = document.getElementById("breadcrumb");
+    const stepContent = document.getElementById("stepContent");
+    const prevButton = document.getElementById("prevButton");
+    const progressButton = document.getElementById("progressButton");
+    const flowButton = document.getElementById("flowButton");
+    const nextButton = document.getElementById("nextButton");
+    const navigation = document.querySelector(".navigation");
+    const videoButton = document.getElementById("videoButton");
+    const videoModal = document.getElementById("videoModal");
+    const tutorialVideo = document.getElementById("tutorialVideo");
+    const videoTitle = document.getElementById("videoTitle");
+    const videoError = document.getElementById("videoError");
+    const videoLoading = document.getElementById("videoLoading");
+    const directVideoLink = document.getElementById("directVideoLink");
+    const closeVideoButton = document.getElementById("closeVideoButton");
+
+    let currentScreen = "home";
+    let currentDetail = 0;
+    let activeVideo = null;
+    let prevAction = null;
+    let nextAction = null;
+
+    function makeList(items) {
+      if (!items || items.length === 0) return "";
+      return `<ul class="content-list">${items.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+    }
+
+    function makeContent(data) {
+      return [
+        makeList(data.bullets),
+        data.script ? `
+          <div class="script-box">
+            <span class="box-label">검사자 멘트</span>
+            <p>“${data.script}”</p>
+          </div>
+        ` : "",
+        data.image ? `
+          <img class="guide-image" src="${data.image}" alt="${data.imageAlt || ""}">
+          <p class="image-caption">엄지손가락이 위, 새끼손가락이 아래</p>
+        ` : "",
+        data.notice ? `
+          <div class="notice-box">
+            <span class="box-label">주의사항</span>
+            <p>${data.notice}</p>
+          </div>
+        ` : ""
+      ].join("");
+    }
+
+    function makeHome() {
+      const items = [
+        { label: "검사 설명", screen: "explanation" },
+        { label: "검사 진행", screen: "progress" },
+        { label: "검사 진행 팁", screen: "tips" }
+      ];
+
+      return `
+        <div class="home-flow">
+          ${items.map((item, index) => `
+            <button class="home-flow-button" type="button" data-screen="${item.screen}">
+              <span class="home-flow-number">${index + 1}</span>
+              <span>${item.label}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function makeProgressMenu() {
+      return `
+        <p class="sequence-intro">실제 검사 진행 순서</p>
+        <ol class="sequence-menu" aria-label="실제 검사 진행 순서">
+          ${detailSteps.map((item, index) => `
+            <li>
+              <button class="sequence-button" type="button" data-detail="${index}">
+                <span class="sequence-number">${index + 1}</span>
+                <span class="sequence-label">${item.title}</span>
+                <span class="sequence-action">보기 ▶</span>
+              </button>
+            </li>
+          `).join("")}
+        </ol>
+      `;
+    }
+
+    function makeVideoCategories(items, attributeName) {
+      return `
+        <div class="video-category-grid">
+          ${items.map((item, index) => `
+            <button
+              class="video-category-button"
+              type="button"
+              ${attributeName}="${index}"
+            >
+              <span>${item.title}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function goTo(screen, detailIndex = 0) {
+      currentScreen = screen;
+      currentDetail = detailIndex;
+      renderScreen();
+    }
+
+    function configureNavigation({ prev, next, nextLabel = "다음 →", showProgressReturn = false }) {
+      prevAction = prev || null;
+      nextAction = next || null;
+      prevButton.hidden = !prevAction;
+      nextButton.hidden = !nextAction;
+      nextButton.textContent = nextLabel;
+      progressButton.hidden = !showProgressReturn;
+      navigation.classList.toggle("has-progress-return", showProgressReturn);
+    }
+
+    function renderScreen() {
+      activeVideo = null;
+      videoButton.hidden = true;
+
+      if (currentScreen === "home") {
+        breadcrumb.textContent = "검사 진행 흐름";
+        stepBadge.textContent = "홈";
+        stepTitle.textContent = "검사 진행 흐름";
+        stepContent.innerHTML = makeHome();
+        configureNavigation({});
+        flowButton.hidden = true;
+
+        stepContent.querySelectorAll("[data-screen]").forEach((button) => {
+          button.addEventListener("click", () => goTo(button.dataset.screen));
+        });
+      }
+
+      if (currentScreen === "explanation") {
+        flowButton.hidden = false;
+        breadcrumb.textContent = "검사 진행 흐름 > 검사 설명";
+        stepBadge.textContent = "검사 설명";
+        stepTitle.textContent = explanation.title;
+        stepContent.innerHTML = makeContent(explanation);
+        configureNavigation({
+          prev: () => goTo("home"),
+          next: () => goTo("progress")
+        });
+      }
+
+      if (currentScreen === "progress") {
+        flowButton.hidden = false;
+        breadcrumb.textContent = "검사 진행 흐름 > 검사 진행";
+        stepBadge.textContent = "검사 진행";
+        stepTitle.textContent = "검사 진행";
+        stepContent.innerHTML = makeVideoCategories([
+          { title: "전체 영상" },
+          { title: "단계별 영상" }
+        ], "data-progress-category");
+        configureNavigation({
+          prev: () => goTo("explanation"),
+          next: () => goTo("tips")
+        });
+
+        stepContent.querySelectorAll("[data-progress-category]").forEach((button) => {
+          button.addEventListener("click", () => {
+            goTo(Number(button.dataset.progressCategory) === 0 ? "full-videos" : "step-videos");
+          });
+        });
+      }
+
+      if (currentScreen === "full-videos") {
+        flowButton.hidden = false;
+        breadcrumb.textContent = "검사 진행 흐름 > 검사 진행 > 전체 영상";
+        stepBadge.textContent = "전체 영상";
+        stepTitle.textContent = "전체 영상";
+        stepContent.innerHTML = makeVideoCategories(fullVideos, "data-full-video");
+        configureNavigation({
+          prev: () => goTo("progress"),
+          next: () => goTo("progress"),
+          nextLabel: "검사 진행으로"
+        });
+
+        stepContent.querySelectorAll("[data-full-video]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const selectedVideo = fullVideos[Number(button.dataset.fullVideo)];
+            activeVideo = selectedVideo.video;
+            openVideo(activeVideo, selectedVideo.title);
+          });
+        });
+      }
+
+      if (currentScreen === "step-videos") {
+        flowButton.hidden = false;
+        breadcrumb.textContent = "검사 진행 흐름 > 검사 진행 > 단계별 영상";
+        stepBadge.textContent = "단계별 영상";
+        stepTitle.textContent = "단계별 영상";
+        stepContent.innerHTML = makeProgressMenu();
+        configureNavigation({
+          prev: () => goTo("progress"),
+          next: () => goTo("progress"),
+          nextLabel: "검사 진행으로"
+        });
+
+        stepContent.querySelectorAll("[data-detail]").forEach((button) => {
+          button.addEventListener("click", () => goTo("detail", Number(button.dataset.detail)));
+        });
+      }
+
+      if (currentScreen === "tips") {
+        flowButton.hidden = false;
+        breadcrumb.textContent = "검사 진행 흐름 > 검사 진행 팁";
+        stepBadge.textContent = "검사 진행 팁";
+        stepTitle.textContent = tips.title;
+        stepContent.innerHTML = makeContent(tips);
+        activeVideo = tips.video;
+        videoButton.hidden = !activeVideo;
+        configureNavigation({
+          prev: () => goTo("progress"),
+          next: () => goTo("home"),
+          nextLabel: "처음으로"
+        });
+      }
+
+      if (currentScreen === "detail") {
+        flowButton.hidden = false;
+        const detail = detailSteps[currentDetail];
+        breadcrumb.textContent = `검사 진행 흐름 > 검사 진행 > 단계별 영상 > ${detail.shortTitle}`;
+        stepBadge.textContent = `검사 진행 ${currentDetail + 1} / ${detailSteps.length}`;
+        stepTitle.textContent = detail.title;
+        stepContent.innerHTML = makeContent(detail);
+        activeVideo = detail.video;
+        videoButton.hidden = !activeVideo;
+        progressButton.textContent = "단계별 영상으로 돌아가기";
+        configureNavigation({
+          prev: () => goTo("step-videos"),
+          next: () => {
+            if (currentDetail < detailSteps.length - 1) {
+              goTo("detail", currentDetail + 1);
+            } else {
+              goTo("step-videos");
+            }
+          },
+          nextLabel: currentDetail < detailSteps.length - 1 ? "다음 단계 →" : "목록으로",
+          showProgressReturn: true
+        });
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeVideo() {
+      tutorialVideo.pause();
+      tutorialVideo.removeAttribute("src");
+      tutorialVideo.load();
+      videoError.hidden = true;
+      videoError.textContent = "";
+      videoLoading.hidden = true;
+      videoModal.close();
+    }
+
+    function openVideo(videoPath, title) {
+      const safeVideoPath = encodeURI(videoPath);
+      videoError.hidden = true;
+      videoError.textContent = "";
+      videoLoading.hidden = false;
+      videoTitle.textContent = title;
+      directVideoLink.href = safeVideoPath;
+      tutorialVideo.pause();
+      tutorialVideo.src = safeVideoPath;
+      tutorialVideo.load();
+      videoModal.showModal();
+      tutorialVideo.play().catch(() => {
+        // 자동 재생이 제한된 경우 영상의 재생 버튼을 누르면 됩니다.
+      });
+    }
+
+    prevButton.addEventListener("click", () => prevAction?.());
+    nextButton.addEventListener("click", () => nextAction?.());
+    flowButton.addEventListener("click", () => goTo("home"));
+    progressButton.addEventListener("click", () => goTo("step-videos"));
+
+    videoButton.addEventListener("click", () => {
+      if (!activeVideo) return;
+      openVideo(activeVideo, `${stepTitle.textContent} 영상`);
+    });
+
+    tutorialVideo.addEventListener("error", () => {
+      const code = tutorialVideo.error?.code;
+      videoLoading.hidden = true;
+      videoError.textContent = `영상을 불러오지 못했습니다. 파일 경로 또는 브라우저 재생 환경을 확인해 주세요. (오류 코드: ${code || "알 수 없음"})`;
+      videoError.hidden = false;
+    });
+
+    tutorialVideo.addEventListener("loadedmetadata", () => {
+      videoLoading.hidden = true;
+    });
+
+    tutorialVideo.addEventListener("canplay", () => {
+      videoLoading.hidden = true;
+    });
+
+    tutorialVideo.addEventListener("waiting", () => {
+      if (!tutorialVideo.paused) videoLoading.hidden = false;
+    });
+
+    tutorialVideo.addEventListener("playing", () => {
+      videoLoading.hidden = true;
+    });
+
+    closeVideoButton.addEventListener("click", closeVideo);
+    videoModal.addEventListener("click", (event) => {
+      if (event.target === videoModal) closeVideo();
+    });
+    videoModal.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeVideo();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (videoModal.open) return;
+      if (event.key === "ArrowLeft") prevAction?.();
+      if (event.key === "ArrowRight") nextAction?.();
+    });
+
+    renderScreen();
+  </script>
+</body>
+</html>
