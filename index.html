@@ -354,6 +354,38 @@
       background: var(--primary-dark);
     }
 
+    .inline-video-section {
+      margin-top: 24px;
+    }
+
+    .inline-video-label {
+      margin: 0 0 9px;
+      color: var(--primary-dark);
+      font-size: 0.92rem;
+      font-weight: 850;
+    }
+
+    .inline-video {
+      width: 100%;
+      max-height: 62dvh;
+      border-radius: 16px;
+      display: block;
+      background: #000000;
+      box-shadow: 0 10px 24px rgba(21, 38, 67, 0.14);
+    }
+
+    .nav-button.next.is-ready {
+      animation: readyPulse 1.3s ease-in-out 2;
+      box-shadow: 0 0 0 5px rgba(47, 111, 237, 0.2), 0 8px 18px rgba(47, 111, 237, 0.28);
+    }
+
+    @keyframes readyPulse {
+      50% {
+        transform: translateY(-2px);
+        background: var(--primary-dark);
+      }
+    }
+
     .navigation {
       padding-top: 18px;
       display: grid;
@@ -1153,6 +1185,26 @@
       ].join("");
     }
 
+    function makeInlineVideo(videoPath, title) {
+      if (!videoPath) return "";
+      return `
+        <section class="inline-video-section">
+          <p class="inline-video-label">${title} 영상</p>
+          <video
+            class="inline-video"
+            id="inlineVideo"
+            src="${encodeURI(videoPath)}"
+            controls
+            playsinline
+            webkit-playsinline
+            preload="metadata"
+          >
+            브라우저에서 영상을 재생할 수 없습니다.
+          </video>
+        </section>
+      `;
+    }
+
     function makeHome() {
       const items = [
         { label: "검사 설명", screen: "explanation" },
@@ -1224,6 +1276,7 @@
     function renderScreen() {
       activeVideo = null;
       videoButton.hidden = true;
+      nextButton.classList.remove("is-ready");
 
       if (currentScreen === "home") {
         breadcrumb.textContent = "검사 진행 흐름";
@@ -1330,9 +1383,7 @@
         breadcrumb.textContent = `검사 진행 흐름 > 검사 진행 > 단계별 영상 > ${detail.shortTitle}`;
         stepBadge.textContent = `검사 진행 ${currentDetail + 1} / ${detailSteps.length}`;
         stepTitle.textContent = detail.title;
-        stepContent.innerHTML = makeContent(detail);
-        activeVideo = detail.video;
-        videoButton.hidden = !activeVideo;
+        stepContent.innerHTML = makeContent(detail) + makeInlineVideo(detail.video, detail.shortTitle);
         progressButton.textContent = "단계별 영상으로 돌아가기";
         configureNavigation({
           prev: () => goTo("step-videos"),
@@ -1345,6 +1396,12 @@
           },
           nextLabel: currentDetail < detailSteps.length - 1 ? "다음 단계 →" : "목록으로",
           showProgressReturn: true
+        });
+
+        const inlineVideo = document.getElementById("inlineVideo");
+        inlineVideo?.addEventListener("ended", () => {
+          nextButton.classList.add("is-ready");
+          nextButton.scrollIntoView({ behavior: "smooth", block: "center" });
         });
       }
 
