@@ -493,6 +493,41 @@
       font-weight: 850;
     }
 
+    .video-category-image {
+      width: min(100%, 210px);
+      height: 130px;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      display: block;
+      object-fit: contain;
+      background: #ffffff;
+    }
+
+    .support-image-card {
+      width: min(100%, 310px);
+      margin: 20px auto 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #f7f9fc;
+      text-align: center;
+    }
+
+    .support-image {
+      width: 100%;
+      max-height: 240px;
+      display: block;
+      object-fit: contain;
+      border-radius: 11px;
+    }
+
+    .support-image-caption {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
     .video-category-button:hover {
       border-color: #9bb9ea;
       background: var(--primary-soft);
@@ -648,6 +683,11 @@
         min-height: 112px;
       }
 
+      .video-category-image {
+        width: min(100%, 180px);
+        height: 110px;
+      }
+
       .video-modal {
         width: calc(100% - 12px);
         max-height: calc(100dvh - 12px);
@@ -679,12 +719,12 @@
           alt="부천시장애인종합복지관"
         >
       </div>
-      <p class="breadcrumb" id="breadcrumb">검사 진행 흐름</p>
+      <p class="breadcrumb" id="breadcrumb">목차</p>
     </header>
 
     <article class="tutorial-card" id="tutorialCard" aria-live="polite">
       <span class="step-badge" id="stepBadge">홈</span>
-      <h2 class="step-title" id="stepTitle">검사 진행 흐름</h2>
+      <h2 class="step-title" id="stepTitle">목차</h2>
       <div id="stepContent"></div>
       <button class="video-button" id="videoButton" type="button" hidden>
         ▶ 영상 보기
@@ -1058,6 +1098,9 @@
         "6번째 포스트는 그대로 제공합니다."
       ],
       notice: "6번째 포스트만 그대로 제공하고, 나머지 물체는 뒤집어서 제공합니다.",
+      supportImage: "images/post_6.png",
+      supportImageAlt: "6번째 포스트 이미지",
+      supportImageCaption: "6번째 포스트",
       video: "videos/video_01_object_direction.mp4"
     };
 
@@ -1067,11 +1110,15 @@
     */
     const fullVideos = [
       {
-        title: "실린더 영상",
+        title: "실린더 영상 보기",
+        image: "images/cylinder.png",
+        imageAlt: "실린더",
         video: "videos/video_full_cylinder.mp4"
       },
       {
-        title: "포스트 영상",
+        title: "포스트 영상 보기",
+        image: "images/post.png",
+        imageAlt: "포스트",
         video: "videos/video_full_post.mp4"
       }
     ];
@@ -1086,6 +1133,9 @@
           "물체의 윗부분이 엄지손가락 쪽에 오도록 합니다."
         ],
         notice: "물체의 윗부분은 엄지손가락 쪽입니다.",
+        supportImage: "images/post_6.png",
+        supportImageAlt: "6번째 포스트 이미지",
+        supportImageCaption: "6번째 포스트",
         video: "videos/video_03_place_object.mp4"
       },
       {
@@ -1176,6 +1226,17 @@
           <img class="guide-image" src="${data.image}" alt="${data.imageAlt || ""}">
           <p class="image-caption">엄지손가락이 위, 새끼손가락이 아래</p>
         ` : "",
+        data.supportImage ? `
+          <figure class="support-image-card">
+            <img
+              class="support-image"
+              src="${data.supportImage}"
+              alt="${data.supportImageAlt || ""}"
+              onerror="this.parentElement.hidden=true"
+            >
+            <figcaption class="support-image-caption">${data.supportImageCaption || ""}</figcaption>
+          </figure>
+        ` : "",
         data.notice ? `
           <div class="notice-box">
             <span class="box-label">주의사항</span>
@@ -1250,6 +1311,14 @@
               type="button"
               ${attributeName}="${index}"
             >
+              ${item.image ? `
+                <img
+                  class="video-category-image"
+                  src="${item.image}"
+                  alt="${item.imageAlt || item.title}"
+                  onerror="this.hidden=true"
+                >
+              ` : ""}
               <span>${item.title}</span>
             </button>
           `).join("")}
@@ -1279,9 +1348,9 @@
       nextButton.classList.remove("is-ready");
 
       if (currentScreen === "home") {
-        breadcrumb.textContent = "검사 진행 흐름";
+        breadcrumb.textContent = "목차";
         stepBadge.textContent = "홈";
-        stepTitle.textContent = "검사 진행 흐름";
+        stepTitle.textContent = "목차";
         stepContent.innerHTML = makeHome();
         configureNavigation({});
         flowButton.hidden = true;
